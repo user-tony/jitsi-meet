@@ -240,9 +240,10 @@ function _setRemoteDescription(sessionDescription) {
  * @returns {Promise}
  */
 function _synthesizeIPv6Addresses(sdp) {
-    // The synthesis of IPv6 addresses is implemented on iOS only at the time of
-    // this writing.
-    if (!NativeModules.POSIX) {
+    // The synthesis of IPv6 addresses on iOS is implemented using POSIX
+    // 'getaddrinfo' and on Android by custom module which figures out a NAT64
+    // prefix.
+    if (!NativeModules.POSIX && !NativeModules.Nat64Info) {
         return Promise.resolve(sdp);
     }
 
@@ -272,7 +273,9 @@ function _synthesizeIPv6Addresses0(sessionDescription) {
     let start = 0;
     const lines = [];
     const ips = new Map();
-    const { getaddrinfo } = NativeModules.POSIX;
+    const getaddrinfo = NativeModules.POSIX && NativeModules.POSIX.getaddrinfo;
+    const getIpV6Address
+        = NativeModules.Nat64Info && NativeModules.Nat64Info.getIpV6Address;
 
     do {
         const end = sdp.indexOf('\r\n', start);
@@ -310,7 +313,7 @@ function _synthesizeIPv6Addresses0(sessionDescription) {
 
                                 if (v && typeof v === 'string') {
                                     resolve(v);
-                                } else {
+                                } else if (typeof getaddrinfo === 'function') {
                                     getaddrinfo(ip, undefined).then(
                                         ([ { ai_addr: value } ]) => {
                                             if (value.indexOf(':') === -1
@@ -322,6 +325,23 @@ function _synthesizeIPv6Addresses0(sessionDescription) {
                                             resolve(value);
                                         },
                                         reject);
+                                } else if (
+                                    typeof getIpV6Address === 'function') {
+                                    getIpV6Address(ip).then(
+                                        value => {
+                                            if (value) {
+                                                ips.set(ip, value);
+                                            } else {
+                                                ips.delete(ip);
+                                            }
+                                            resolve(value);
+                                        },
+                                        reject);
+                                } else {
+                                    reject(
+                                        'The impossible just happened (no POSIX'
+                                            + ' nor NAT64Info module'
+                                            + ' available)');
                                 }
                             }));
                     } else {
