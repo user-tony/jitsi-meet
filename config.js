@@ -194,13 +194,13 @@ var config = {
 
     // Disables or enables TCC.
     // (draft-holmer-rmcat-transport-wide-cc-extensions-01)
-    enableTcc: true,
+    // enableTcc: true,
 
     // Disables or enables REMB (draft-alvestrand-rmcat-remb-03).
-    enableRemb: false,
+    // enableRemb: false,
 
     // Defines the minimum number of participants to start a call.
-    minParticipants: 2,
+    // minParticipants: 2,
 
     // Use XEP-0215 to fetch STUN and TURN servers.
     // useStunTurn: true,
