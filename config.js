@@ -192,14 +192,16 @@ var config = {
     // Disables or enables RTX (RFC 4588) (defaults to false).
     // disableRtx: false,
 
-    // Disables or enables TCC.
+    // Disables or enables TCC (the default is in Jicofo and set to true)
     // (draft-holmer-rmcat-transport-wide-cc-extensions-01)
     // enableTcc: true,
 
-    // Disables or enables REMB (draft-alvestrand-rmcat-remb-03).
+    // Disables or enables REMB (the default is in Jicofo and set to false)
+    // (draft-alvestrand-rmcat-remb-03).
     // enableRemb: false,
 
-    // Defines the minimum number of participants to start a call.
+    // Defines the minimum number of participants to start a call (the default
+    // is set in Jicofo and set to 2).
     // minParticipants: 2,
 
     // Use XEP-0215 to fetch STUN and TURN servers.
